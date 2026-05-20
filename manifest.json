@@ -1,18 +1,22 @@
 {
-  "name": "Captura de Matrículas Pro",
-  "short_name": "Matrículas Pro",
-  "description": "Aplicación para control y captura de matrículas",
-  "start_url": "index.html",
-  "display": "standalone",
+  "theme_color": "#1e293b",
   "background_color": "#0f172a",
-  "theme_color": "#0f172a",
-  "orientation": "portrait-primary",
+  "display": "standalone",
+  "scope": "./",
+  "start_url": "./index.html",
+  "name": "Captura de Matrículas Profesional",
+  "short_name": "Matrículas",
+  "description": "Aplicación web móvil optimizada para registrar y descargar fotografías de patentes y matrículas.",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/3065/3065537.png",
+      "src": "icono.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icono.png",
       "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     }
   ]
 }

@@ -4,68 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Captura de Matrículas Pro</title>
-    
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <link rel="icon" type="image/png" href="icono.png">
     <style>
         :root {
-            --bg-principal: #0f172a;
-            --bg-tarjeta: #1e293b;
-            --texto: #f8fafc;
-            --texto-secundario: #94a3b8;
-            --azul-accent: #3b82f6;
-            --azul-hover: #2563eb;
-            --borde: #334155;
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --text: #f8fafc;
+            --text-muted: #94a3b8;
         }
 
         body {
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-principal);
-            color: var(--texto);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
             margin: 0;
             padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             box-sizing: border-box;
         }
 
-        .dashboard {
-            background-color: var(--bg-tarjeta);
-            border: 1px solid var(--borde);
-            padding: 25px;
-            border-radius: 20px;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
-            max-width: 500px;
-            width: 100%;
-        }
-
-        header h1 {
-            font-size: 22px;
-            margin: 0 0 5px 0;
+        h1 {
+            font-size: 24px;
             text-align: center;
-            font-weight: 700;
+            margin-top: 0;
+            margin-bottom: 8px;
         }
 
-        header p {
-            color: var(--texto-secundario);
-            font-size: 13px;
-            margin: 0 0 20px 0;
+        .subtitle {
             text-align: center;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 24px;
         }
 
-        .camera-wrapper {
-            position: relative;
+        .video-container {
             width: 100%;
+            aspect-ratio: 4 / 3;
+            background: #000;
             border-radius: 12px;
             overflow: hidden;
-            border: 2px solid var(--borde);
-            background-color: #000;
-            aspect-ratio: 4 / 3;
+            position: relative;
+            margin-bottom: 20px;
+            border: 2px solid #334155;
         }
 
         video {
@@ -80,228 +75,242 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: white;
+            background: white;
             opacity: 0;
             pointer-events: none;
+            transition: opacity 0.1s ease-out;
+            z-index: 10;
         }
 
-        @keyframes trigger-flash {
-            0% { opacity: 0.9; }
-            100% { opacity: 0; }
-        }
-
-        .form-group {
-            margin: 20px 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .input-group {
+            margin-bottom: 20px;
         }
 
         label {
-            font-size: 11px;
+            display: block;
+            font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--texto-secundario);
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
             font-weight: 600;
         }
 
         input[type="text"] {
-            background-color: var(--bg-principal);
-            border: 2px solid var(--borde);
-            color: var(--texto);
+            width: 100%;
             padding: 14px;
-            border-radius: 10px;
+            background: #0f172a;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            color: white;
             font-size: 18px;
-            font-weight: 700;
-            text-transform: uppercase;
+            font-weight: bold;
             text-align: center;
-            letter-spacing: 2px;
-            transition: border-color 0.3s;
+            text-transform: uppercase;
+            box-sizing: border-box;
+            letter-spacing: 0.1em;
+            transition: border-color 0.2s;
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--azul-accent);
+            border-color: var(--primary);
         }
 
         button {
             width: 100%;
-            background: linear-gradient(135deg, var(--azul-accent), var(--azul-hover));
+            padding: 14px;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 15px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
-            border-radius: 10px;
             cursor: pointer;
             display: flex;
-            justify-content: center;
             align-items: center;
-            gap: 10px;
-            -webkit-tap-highlight-color: transparent;
+            justify-content: center;
+            gap: 8px;
+            transition: background var(--primary-hover) 0.2s;
         }
 
-        button:active {
-            transform: scale(0.98);
+        button:hover {
+            background: var(--primary-hover);
         }
 
-        .gallery-section {
-            margin-top: 25px;
-            border-top: 1px solid var(--borde);
-            padding-top: 20px;
+        .gallery {
+            margin-top: 24px;
+            border-top: 1px solid #334155;
+            padding-top: 16px;
         }
 
-        .gallery-header {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--texto-secundario);
+        .gallery-title {
+            font-size: 14px;
+            color: var(--text-muted);
             margin-bottom: 12px;
         }
 
-        .gallery-grid {
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+            grid-template-columns: repeat(4, 100px);
             gap: 10px;
-            max-height: 160px;
-            overflow-y: auto;
+            overflow-x: auto;
+            padding-bottom: 10px;
         }
 
-        .thumbnail-container {
-            aspect-ratio: 4 / 3;
+        .thumb-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
             border-radius: 6px;
             overflow: hidden;
-            border: 2px solid var(--borde);
+            border: 1px solid #475569;
+            background: #000;
         }
 
-        .thumbnail {
+        .thumb-container img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        canvas {
-            display: none;
+        .thumb-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            font-size: 9px;
+            text-align: center;
+            padding: 2px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
     </style>
 </head>
 <body>
 
-<div class="dashboard">
-    <header>
-        <h1>Control de Matrículas</h1>
-        <p>Captura fotos de vehículos desde tu móvil</p>
-    </header>
-    
-    <div class="camera-wrapper">
+<div class="container">
+    <h1>Control de Matrículas</h1>
+    <div class="subtitle">Captura fotos de vehículos desde tu móvil</div>
+
+    <div class="video-container">
         <video id="video" autoplay playsinline></video>
         <div id="flash" class="flash-effect"></div>
     </div>
-    
-    <div class="form-group">
+
+    <div class="input-group">
         <label for="matricula">Matrícula del Vehículo</label>
-        <input type="text" id="matricula" placeholder="EJ: 1234ABC" autocomplete="off">
+        <input type="text" id="matricula" placeholder="EJ: 1234ABC" maxlength="10">
     </div>
-    
-    <button id="btnCapturar">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>
+
+    <button id="capture-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
         Tomar Foto y Guardar
     </button>
-    
-    <canvas id="canvas"></canvas>
-    
-    <div class="gallery-section">
-        <div class="gallery-header">Miniaturas Guardadas</div>
-        <div id="gallery" class="gallery-grid"></div>
+
+    <div class="gallery">
+        <div class="gallery-title">Miniaturas Guardadas</div>
+        <div id="grid" class="grid"></div>
     </div>
 </div>
+
+<canvas id="canvas" style="display: none;"></canvas>
 
 <script>
     const video = document.getElementById('video');
     const canvas = document.getElementById('canvas');
-    const btnCapturar = document.getElementById('btnCapturar');
-    const inputMatricula = document.getElementById('matricula');
-    const gallery = document.getElementById('gallery');
+    const captureBtn = document.getElementById('capture-btn');
+    const matriculaInput = document.getElementById('matricula');
     const flash = document.getElementById('flash');
+    const grid = document.getElementById('grid');
 
-    // Configuración optimizada para móviles
-    const constraints = {
-        video: {
-            facingMode: { ideal: "environment" },
-            width: { ideal: 1280 },
-            height: { ideal: 720 }
-        },
-        audio: false
-    };
-
-    // Acceso mejorado a la cámara para evitar bloqueos en iOS/Android
-    navigator.mediaDevices.getUserMedia(constraints)
-        .then(stream => { 
-            video.srcObject = stream; 
-            video.play().catch(e => console.log("Ajustando reproducción automática."));
-        })
-        .catch(err => { 
-            alert("Error al activar la cámara. Asegúrate de otorgar permisos y abrir la web usando HTTPS."); 
-            console.error(err);
-        });
-
-    btnCapturar.addEventListener('click', () => {
-        const textoMatricula = inputMatricula.value.trim().toUpperCase();
-
-        if (!textoMatricula) {
-            alert("⚠️ Por favor, introduce la matrícula antes de tomar la foto.");
-            inputMatricula.focus();
-            return;
+    // Inicializar cámara trasera en alta definición
+    async function initCamera() {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: { exact: "environment" },
+                    width: { ideal: 1920 },
+                    height: { ideal: 1080 }
+                },
+                audio: false
+            });
+            video.srcObject = stream;
+        } catch (err) {
+            // Reintento si falla la trasera estricta (por ejemplo en PC)
+            try {
+                const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+                video.srcObject = fallbackStream;
+            } catch (fallbackErr) {
+                alert("Error al activar la cámara. Asegúrate de otorgar permisos y abrir la web usando HTTPS.");
+            }
         }
+    }
 
-        // Animación Flash de captura
-        flash.style.animation = 'none';
-        setTimeout(() => { flash.style.animation = 'trigger-flash 0.3s ease-out'; }, 10);
+    // Efecto visual de flash blanco
+    function triggerFlash() {
+        flash.style.opacity = '1';
+        setTimeout(() => { flash.style.opacity = '0'; }, 150);
+    }
 
-        // Seguridad: Dimensiones por defecto si falla la lectura de metadatos del stream
-        canvas.width = video.videoWidth || 1280;
-        canvas.height = video.videoHeight || 720;
-        
+    // Proceso de captura y guardado automático
+    captureBtn.addEventListener('click', () => {
+        let matriculaText = matriculaInput.value.trim().toUpperCase() || "SIN_MATRICULA";
+        matriculaText = matriculaText.replace(/[^A-Z0-9_-]/g, ""); // Limpiar caracteres raros
+
         const ctx = canvas.getContext('2d');
+        canvas.width = video.videoWidth || 640;
+        canvas.height = video.videoHeight || 480;
+        
+        // Dibujar el fotograma actual del vídeo en el lienzo oculto
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const fotoBase64 = canvas.toDataURL('image/png');
+        
+        triggerFlash();
 
-        // Formatear Fecha y Hora actuales
+        // Convertir a archivo descargable
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
+        
+        // Obtener fecha y hora local formateada para Windows
         const ahora = new Date();
         const fecha = ahora.toISOString().split('T')[0];
         const hora = ahora.toTimeString().split(' ')[0].replace(/:/g, '-');
+
+        // Forzar descarga directa del archivo binario
+        const link = document.createElement('a');
+        link.download = `Matricula-${matriculaText}_${fecha}_${hora}.jpg`;
+        link.href = dataUrl;
+        link.click();
+
+        // Crear elemento visual en la mini galería de abajo
+        const thumbContainer = document.createElement('div');
+        thumbContainer.className = 'thumb-container';
         
-        // Nombre del archivo solicitado
-        const nombreArchivo = `Matricula-${textoMatricula}_${fecha}_${hora}.png`;
-
-        // Insertar miniatura debajo
-        const contenedor = document.createElement('div');
-        contenedor.className = 'thumbnail-container';
         const img = document.createElement('img');
-        img.src = fotoBase64;
-        img.className = 'thumbnail';
-        contenedor.appendChild(img);
-        gallery.insertBefore(contenedor, gallery.firstChild);
+        img.src = dataUrl;
+        
+        const label = document.createElement('div');
+        label.className = 'thumb-label';
+        label.innerText = matriculaText;
 
-        // Forzar la descarga en el almacenamiento local del dispositivo
-        const enlace = document.createElement('a');
-        enlace.href = fotoBase64;
-        enlace.download = nombreArchivo;
-        document.body.appendChild(enlace);
-        enlace.click();
-        document.body.removeChild(enlace);
+        thumbContainer.appendChild(img);
+        thumbContainer.appendChild(label);
+        grid.insertBefore(thumbContainer, grid.firstChild);
 
-        // Limpiar el campo para el siguiente coche
-        inputMatricula.value = '';
+        // Limpiar el campo de texto para la siguiente captura
+        matriculaInput.value = '';
     });
 
-    // --- REGISTRO DE LA PWA ---
+    // Registrar el Service Worker de la PWA si está soportado
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => console.log('PWA lista y registrada con éxito.'))
-                .catch(err => console.error('Error al registrar PWA:', err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error:", err));
         });
     }
+
+    window.addEventListener('DOMContentLoaded', initCamera);
 </script>
 
 </body>
