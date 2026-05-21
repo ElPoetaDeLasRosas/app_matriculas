@@ -194,7 +194,7 @@
 
 <div class="container">
     <h1>Control de Matrículas</h1>
-    <div class="subtitle">Captura fotos de vehículos desde tu móvil</div>
+    <div class="subtitle">Captura fotos organizadas por Año y Matrícula</div>
 
     <div class="video-container">
         <video id="video" autoplay playsinline></video>
@@ -208,7 +208,7 @@
 
     <button id="capture-btn">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
-        Tomar Foto y Guardar
+        Tomar Foto y Guardar en Equipo
     </button>
 
     <div class="gallery">
@@ -227,12 +227,12 @@
     const flash = document.getElementById('flash');
     const grid = document.getElementById('grid');
 
-    // Inicializar cámara trasera en alta definición
+    // Inicializar cámara
     async function initCamera() {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: {
-                    facingMode: { exact: "environment" },
+                    facingMode: { ideal: "environment" },
                     width: { ideal: 1920 },
                     height: { ideal: 1080 }
                 },
@@ -240,7 +240,6 @@
             });
             video.srcObject = stream;
         } catch (err) {
-            // Reintento si falla la trasera estricta (por ejemplo en PC)
             try {
                 const fallbackStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 video.srcObject = fallbackStream;
@@ -250,41 +249,62 @@
         }
     }
 
-    // Efecto visual de flash blanco
     function triggerFlash() {
         flash.style.opacity = '1';
         setTimeout(() => { flash.style.opacity = '0'; }, 150);
     }
 
-    // Proceso de captura y guardado automático
-    captureBtn.addEventListener('click', () => {
+    // Proceso de captura y envío al servidor local del equipo
+    captureBtn.addEventListener('click', async () => {
         let matriculaText = matriculaInput.value.trim().toUpperCase() || "SIN_MATRICULA";
-        matriculaText = matriculaText.replace(/[^A-Z0-9_-]/g, ""); // Limpiar caracteres raros
+        matriculaText = matriculaText.replace(/[^A-Z0-9_-]/g, ""); 
 
         const ctx = canvas.getContext('2d');
         canvas.width = video.videoWidth || 640;
         canvas.height = video.videoHeight || 480;
         
-        // Dibujar el fotograma actual del vídeo en el lienzo oculto
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
         triggerFlash();
 
-        // Convertir a archivo descargable
         const dataUrl = canvas.toDataURL('image/jpeg', 0.9);
         
-        // Obtener fecha y hora local formateada para Windows
         const ahora = new Date();
-        const fecha = ahora.toISOString().split('T')[0];
+        const anio = ahora.getFullYear(); 
         const hora = ahora.toTimeString().split(' ')[0].replace(/:/g, '-');
 
-        // Forzar descarga directa del archivo binario
-        const link = document.createElement('a');
-        link.download = `Matricula-${matriculaText}_${fecha}_${hora}.jpg`;
-        link.href = dataUrl;
-        link.click();
+        const nombreCarpetaAnio = `fotos ${anio}`;
+        const nombreArchivo = `${matriculaText}_${hora}.jpg`; 
 
-        // Crear elemento visual en la mini galería de abajo
+        // --- SISTEMA DE ENVÍO POR RED LOCAL (IP MODIFICADA) ---
+        try {
+            // Convertimos la imagen base64 (dataUrl) en un archivo binario (Blob)
+            const responseBlob = await fetch(dataUrl);
+            const blob = await responseBlob.blob();
+
+            // Preparamos los datos para enviarlos al servidor del ordenador
+            const formData = new FormData();
+            formData.append('foto', blob, nombreArchivo);
+            formData.append('matricula', matriculaText);
+            formData.append('anio', nombreCarpetaAnio);
+
+            // Petición HTTP al equipo (puedes cambiar el puerto :3000 si tu backend usa otro)
+            const res = await fetch('http://192.168.13.190:3000/guardar-foto', {
+                method: 'POST',
+                body: formData
+            });
+
+            if(res.ok) {
+                console.log('Foto guardada correctamente en el equipo.');
+            } else {
+                console.error('El servidor del equipo respondió con un error.');
+            }
+
+        } catch (err) {
+            console.error("No se pudo conectar con el equipo en la IP 192.168.13.190. Verifica la red o el servidor.", err);
+        }
+        // -----------------------------------------------------
+
+        // Crear elemento en la mini galería web local de la pantalla
         const thumbContainer = document.createElement('div');
         thumbContainer.className = 'thumb-container';
         
@@ -299,11 +319,10 @@
         thumbContainer.appendChild(label);
         grid.insertBefore(thumbContainer, grid.firstChild);
 
-        // Limpiar el campo de texto para la siguiente captura
+        // Limpiar el campo para agilizar el trabajo
         matriculaInput.value = '';
     });
 
-    // Registrar el Service Worker de la PWA si está soportado
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
             navigator.serviceWorker.register('sw.js').catch(err => console.log("SW error:", err));
